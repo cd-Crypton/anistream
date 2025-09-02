@@ -1,0 +1,25 @@
+<svg width="150" height="100" viewBox="0 0 150 100" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Original gradient for the 'A' -->
+    <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#836FFF;" />
+      <stop offset="100%" style="stop-color:#6a5acd;" />
+    </linearGradient>
+    
+    <!-- New, darker gradient for the 'S' -->
+    <linearGradient id="logoGradientDarker" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6a5acd;" />
+      <stop offset="100%" style="stop-color:#483D8B;" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Group for common font styles (fill is now applied to individual letters) -->
+  <g font-family="Poppins, sans-serif" font-size="100" font-weight="700">
+    <!-- The letter 'A' with the original gradient -->
+    <text x="10" y="90" fill="url(#logoGradient)">A</text>
+    
+    <!-- The letter 'S' with the new, darker gradient -->
+    <text x="50" y="90" fill="url(#logoGradientDarker)">S</text>
+  </g>
+</svg>
+

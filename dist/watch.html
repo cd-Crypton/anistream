@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Now Watching - MStream</title>
+    <link rel="stylesheet" href="css/watch.css">
+    <script defer src="js/watch.js"></script>
+</head>
+<body>
+    <header class="watch-header">
+        <a href="index.html" class="home-link"> &larr; Back to Home</a>
+    </header>
+
+    <main class="player-container">
+        <iframe id="video-frame" allowfullscreen></iframe>
+
+        <div class="server-buttons" id="server-buttons"></div>
+        <div class="episode-guide" id="episode-guide">
+            <div class="selectors">
+                <select id="season-selector" aria-label="Select Season"></select>
+            </div>
+            <div class="episode-list" id="episode-list"></div>
+        </div>
+    </main>
+</body>
+</html>

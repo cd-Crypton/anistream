@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AniStream</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/anistream.css"> <!-- New stylesheet -->
+  <link rel="stylesheet" href="css/airing-card.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script src="js/anistream.js"></script> <!-- New JavaScript file -->
+</head>
+
+<body>
+  <div class="navbar">
+    <a href="index.html" class="logo-container">
+      <!-- You can create a new logo for AniStream later -->
+      <img src="img/anistream.svg" alt="AniStream" />
+      <h1 title="AniStream">AniStream</h1>
+    </a>
+  
+    <div class="nav-links">
+      <a href="anistream.html">Home</a>
+      <input type="text" class="search-bar" placeholder="Search anime..." onfocus="openSearchModal()" />
+    </div>
+  </div>
+
+  <div class="banner-slider" id="banner-slider">
+    <div class="banner-slides" id="banner-slides"></div>
+    <div class="banner-dots" id="banner-dots"></div>
+  </div>
+
+  <main class="main-content">
+  <!-- Tab Navigation -->
+    <div class="tab-nav">
+      <button class="tab-btn active" data-tab="airing-now">Currently Airing</button>
+      <button class="tab-btn" data-tab="popular-series">Popular Anime Series</button>
+      <button class="tab-btn" data-tab="top-movies">Top Rated Anime Movies</button>
+    </div>
+
+    <!-- Tab Content Panels -->
+    <div id="airing-now" class="tab-content active">
+      <div class="airing-grid" id="airing-now-list">
+        <!-- "Currently Airing" cards will be loaded here -->
+      </div>
+      <div class="pagination" id="airing-pagination">
+        <!-- Pagination buttons will be generated here -->
+      </div>
+    </div>
+
+    <div id="popular-series" class="tab-content">
+      <div class="row-header">
+        <h2>Popular Anime Series</h2>
+        <div class="slider-nav">
+          <button class="slider-arrow left" onclick="slide('popular-series-list', 'left')" aria-label="Previous">&lt;</button>
+          <button class="slider-arrow right" onclick="slide('popular-series-list', 'right')" aria-label="Next">&gt;</button>
+        </div>
+      </div>
+      <div class="list" id="popular-series-list">
+        <!-- "Popular Anime Series" content will be loaded here -->
+      </div>
+    </div>
+
+    <div id="top-movies" class="tab-content">
+      <div class="row-header">
+        <h2>Top Rated Anime Movies</h2>
+        <div class="slider-nav">
+          <button class="slider-arrow left" onclick="slide('top-movies-list', 'left')" aria-label="Previous">&lt;</button>
+          <button class="slider-arrow right" onclick="slide('top-movies-list', 'right')" aria-label="Next">&gt;</button>
+        </div>
+      </div>
+      <div class="list" id="top-movies-list">
+        <!-- "Top Rated Anime Movies" content will be loaded here -->
+      </div>
+    </div>
+  </main>
+
+  <!-- The Modal and Search Modal structures are identical to your MStream project -->
+  <div class="modal" id="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal()">&times;</span>
+      <div class="modal-body">
+          <img id="modal-image" src="" alt="" />
+          <div class="modal-text">
+          <h2 id="modal-title"></h2>
+          <div class="stars" id="modal-rating"></div>
+          <p id="modal-description"></p>
+          <div class="modal-extra-info">
+              <p><strong>Genres:</strong> <span id="modal-genres"></span></p>
+              <p><strong>Voice Cast:</strong> <span id="modal-cast"></span></p>
+          </div>
+          <a href="#" id="watch-button" class="watch-btn"><i class="fas fa-play"></i> Watch Now</a>
+          </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="search-modal" id="search-modal">
+    <span class="close" onclick="closeSearchModal()">&times;</span>
+    <input type="text" id="search-input" placeholder="Search for an anime..." oninput="searchTMDB()" />
+    <div class="results" id="search-results"></div>
+  </div>
+
+  <footer class="footer">
+    <!-- Your MStream footer can be reused here -->
+    <div class="footer-content">
+        <p>&copy; 2025 AniStream. All rights reserved.</p>
+        <div class="footer-links">
+          <a href="disclaimer.html">Disclaimer</a>
+          <a href="about.html">About Us</a>
+        </div>
+      </div>
+  </footer>
+
+</body>
+</html>
