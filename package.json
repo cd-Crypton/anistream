@@ -2,7 +2,7 @@
   "name": "anistream",
   "version": "1.0.0",
   "scripts": {
-    "build": "npm run copy-files && wrangler pages functions build --outdir=./dist/_worker.js/",
+    "build": "npm run copy-files",
     "copy-files": "mkdir -p dist && cp -r *.html css js img dist/",
     "dev": "wrangler dev",
     "deploy": "npm run build && wrangler deploy",
