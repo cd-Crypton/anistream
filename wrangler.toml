@@ -1,4 +1,4 @@
-name = "anistream"
+name = "anistreamx"
 main = "dist/_worker.js"
 compatibility_date = "2025-06-05"
 
