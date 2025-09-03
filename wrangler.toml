@@ -15,7 +15,3 @@ head_sampling_rate = 1
 secrets_store_secrets = [
   { binding = "TMDB_API_TOKEN", store_id= "9a3e7d97f73941ee83d09d8f2e6dfc49", secret_name = "TMDB_API_TOKEN" }
 ]
-
-[observability]
-enabled = true
-head_sampling_rate = 1
