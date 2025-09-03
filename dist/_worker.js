@@ -6,14 +6,14 @@ export default {
       const url = new URL(request.url);
 
       if (url.pathname.startsWith('/api/')) {
-        // We will now pass the request object to the handler
-        return await this.handleApiRequest(request, env);
+        return await this.handleApiRequest(request, env, ctx);
       }
 
       if (!env.ASSETS) {
         return new Response("Static asset handler is not configured.", { status: 500 });
       }
 
+      // Static asset handling remains the same
       const assetResponse = await env.ASSETS.fetch(request);
       const mutableResponse = new Response(assetResponse.body, assetResponse);
       const contentType = this.getContentType(url.pathname);
@@ -28,15 +28,27 @@ export default {
     }
   },
 
-  async handleApiRequest(request, env) {
+  async handleApiRequest(request, env, ctx) {
+    // --- CACHING LOGIC ADDED ---
+    const cache = caches.default; // Access the default cache
+    let response = await cache.match(request); // Check if the request is already in the cache
+
+    if (response) {
+      // If found in cache, return the cached response immediately
+      console.log("Cache HIT");
+      return response;
+    }
+    console.log("Cache MISS");
+    // --- END OF CACHING LOGIC ---
+
     try {
       if (!env.TMDB_API_TOKEN) {
-        return new Response("Secret binding 'TMDB_API_TOKEN' not found. Please add it in your Cloudflare dashboard.", { status: 500 });
+        return new Response("Secret binding 'TMDB_API_TOKEN' not found.", { status: 500 });
       }
 
       const apiToken = await env.TMDB_API_TOKEN.get();
       if (!apiToken) {
-        return new Response("Failed to retrieve the API token value. The secret might be empty.", { status: 500 });
+        return new Response("Failed to retrieve the API token value.", { status: 500 });
       }
 
       const url = new URL(request.url);
@@ -44,15 +56,32 @@ export default {
       const queryString = url.search;
       const apiUrl = `${TMDB_BASE_URL}${path}${queryString}`;
 
-      // Create a new, clean request and add the Authorization header
       const apiRequest = new Request(apiUrl, {
         headers: {
           'Authorization': `Bearer ${apiToken}`,
-          'Accept': 'application/json' // Good practice to include
+          'Accept': 'application/json'
         }
       });
 
-      return await fetch(apiRequest);
+      // Fetch the response from the TMDB API
+      response = await fetch(apiRequest);
+
+      // --- CACHING LOGIC ADDED ---
+      // Before returning the response, we store it in the cache.
+      if (response.ok) {
+        // We must clone the response to be able to cache it and return it.
+        const cacheableResponse = response.clone();
+
+        // Set the Cache-Control header to determine how long it stays in cache.
+        // 3600 seconds = 1 hour
+        cacheableResponse.headers.set('Cache-Control', 'public, max-age=3600');
+
+        // Use ctx.waitUntil to cache the response without blocking the user's request.
+        ctx.waitUntil(cache.put(request, cacheableResponse));
+      }
+      // --- END OF CACHING LOGIC ---
+
+      return response;
 
     } catch (error) {
       console.error('Error in API request handler:', error);
