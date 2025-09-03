@@ -43,19 +43,42 @@ async function fetchGenres() {
 }
 
 async function searchTMDB() {
-    // ... (This function remains unchanged, but we need to access .results)
     const query = document.getElementById('search-input').value;
     const container = document.getElementById('search-results');
+
     if (!query.trim()) {
         container.innerHTML = '';
         return;
     }
-    const res = await fetch(`${BASE_URL}/search/multi?query=${encodeURIComponent(query)}`);
-    const data = await res.json();
-    const animeResults = data.results.filter(item => 
-        item.genre_ids && item.genre_ids.includes(16) && item.original_language === 'ja' && item.media_type !== 'person'
-    );
-    displayList(animeResults, 'search-results');
+
+    try {
+        const res = await fetch(`${BASE_URL}/search/multi?query=${encodeURIComponent(query)}`);
+
+        if (!res.ok) {
+            console.error("Search API request failed with status:", res.status);
+            container.innerHTML = `<p style="color: var(--text-color-secondary);">Error fetching results. Please try again.</p>`;
+            return;
+        }
+
+        const data = await res.json();
+        
+        // Log the raw results to the console for debugging
+        console.log("Raw API Search Results:", data.results);
+
+        const animeResults = data.results.filter(item =>
+            item.genre_ids && item.genre_ids.includes(16) && item.original_language === 'ja' && item.media_type !== 'person'
+        );
+
+        if (animeResults.length === 0) {
+            container.innerHTML = `<p style="color: var(--text-color-secondary);">No anime found for "${query}".</p>`;
+        } else {
+            displayList(animeResults, 'search-results');
+        }
+
+    } catch (error) {
+        console.error("Error during search:", error);
+        container.innerHTML = `<p style="color: var(--text-color-secondary);">An error occurred during your search.</p>`;
+    }
 }
 
 // ===================================
