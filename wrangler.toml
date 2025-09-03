@@ -1,0 +1,9 @@
+name = "anistream"
+main = "dist/_worker.js"
+compatibility_date = "2025-06-05"
+
+[vars]
+ENVIRONMENT = "production"
+
+[site]
+bucket = "./dist"
