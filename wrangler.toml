@@ -1,6 +1,9 @@
 name = "anistream"
 main = "dist/_worker.js"
 compatibility_date = "2025-06-05"
+secrets_store_secrets = [
+  { binding = "TMDB_API_TOKEN", store_id= "9a3e7d97f73941ee83d09d8f2e6dfc49", secret_name = "TMDB_API_TOKEN" }
+]
 
 # This explicitly binds the 'dist' directory to the 'ASSETS' variable in your worker
 assets = { directory = "./dist" }
@@ -11,7 +14,3 @@ ENVIRONMENT = "production"
 [observability]
 enabled = true
 head_sampling_rate = 1
-
-secrets_store_secrets = [
-  { binding = "TMDB_API_TOKEN", store_id= "9a3e7d97f73941ee83d09d8f2e6dfc49", secret_name = "TMDB_API_TOKEN" }
-]
