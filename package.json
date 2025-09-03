@@ -1,7 +1,14 @@
-"scripts": {
+{
+  "name": "anistream",
+  "version": "1.0.0",
+  "scripts": {
     "build": "npm run copy-files",
     "copy-files": "mkdir -p dist && cp -r *.html css js img dist/",
     "dev": "wrangler dev",
     "deploy": "npm run build && wrangler deploy",
     "deploy:dry": "npm run build && wrangler deploy --dry-run"
   },
+  "devDependencies": {
+    "wrangler": "^4.0.0"
+  }
+}
