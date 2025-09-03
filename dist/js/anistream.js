@@ -12,7 +12,6 @@ let animeTvGenres = new Map();
 let bannerSlidesData = [];
 let currentBannerIndex = 0;
 let bannerInterval;
-let debounceTimer;
 
 // --- New State for Pagination ---
 let airingCurrentPage = 1;
@@ -43,44 +42,32 @@ async function fetchGenres() {
   }
 }
 
-function debounceSearch(event) {
-  // Clear the previous timer to reset the delay
-  clearTimeout(debounceTimer);
-
-  // Set a new timer
-  debounceTimer = setTimeout(() => {
-    searchTMDB(event.target.value);
-  }, 500); // Wait for 500ms after the user stops typing
-}
-
-async function searchTMDB(query) {
+async function searchTMDB() {
+  const query = document.getElementById('search-input').value;
   const container = document.getElementById('search-results');
+
   if (!query.trim()) {
     container.innerHTML = '';
     return;
   }
 
-  try {
-    const res = await fetch(`${BASE_URL}/search/multi?query=${encodeURIComponent(query)}`);
-    if (!res.ok) {
-      throw new Error(`API request failed with status ${res.status}`);
-    }
-    const data = await res.json();
-    const animeResults = data.results.filter(item => 
-        item.genre_ids && item.genre_ids.includes(16) && 
-        item.original_language === 'ja' && 
-        item.media_type !== 'person' && 
-        item.poster_path
-    );
+  const res = await fetch(`${BASE_URL}/search/multi?query=${encodeURIComponent(query)}`);
+  const data = await res.json();
 
-    if (animeResults.length === 0) {
-      container.innerHTML = `<p style="color: var(--text-color-secondary);">No anime found for "${query}".</p>`;
-    } else {
-      displayList(animeResults, 'search-results');
-    }
-  } catch (error) {
-    console.error("Search failed:", error);
-    container.innerHTML = `<p style="color: var(--text-color-secondary);">Error fetching search results.</p>`;
+  // --- ANIME FILTER RE-ADDED ---
+  const animeResults = data.results.filter(item => 
+      item.genre_ids && item.genre_ids.includes(16) && // Checks for Animation genre
+      item.original_language === 'ja' &&              // Checks for Japanese language
+      item.media_type !== 'person' &&                  // Excludes people
+      item.poster_path                                 // Ensures it has an image
+  );
+  // --- END OF FILTER ---
+
+  if (animeResults.length === 0) {
+    container.innerHTML = `<p style="color: var(--text-color-secondary);">No anime found for "${query}".</p>`;
+  } else {
+    // Use the filtered list to display results
+    displayList(animeResults, 'search-results');
   }
 }
 
@@ -319,8 +306,8 @@ function closeModal() { document.getElementById('modal').style.display = 'none';
 // INITIALIZATION
 // ===================================
 async function init() {
-  document.getElementById('search-input').addEventListener('input', debounceSearch);
   setupTabs();
+  
   await fetchGenres();
   try {
     // --- Tab 1: Currently Airing (with Pagination) ---
