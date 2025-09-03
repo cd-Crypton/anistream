@@ -6,7 +6,6 @@ export default {
       const url = new URL(request.url);
 
       if (url.pathname.startsWith('/api/')) {
-        // Pass ctx to the handler for caching
         return await this.handleApiRequest(request, env, ctx);
       }
 
@@ -14,13 +13,23 @@ export default {
         return new Response("Static asset handler is not configured.", { status: 500 });
       }
 
+      // Fetch the static asset
       const assetResponse = await env.ASSETS.fetch(request);
-      const mutableResponse = new Response(assetResponse.body, assetResponse);
+      
+      // --- THE FIX IS HERE ---
+      // Create a new, mutable Headers object from the asset's headers
+      const newHeaders = new Headers(assetResponse.headers);
       const contentType = this.getContentType(url.pathname);
       if (contentType) {
-        mutableResponse.headers.set('Content-Type', contentType);
+        newHeaders.set('Content-Type', contentType);
       }
-      return mutableResponse;
+      
+      // Return a new response with the original body but the new, modified headers
+      return new Response(assetResponse.body, {
+        ...assetResponse, // Copy status, statusText, etc.
+        headers: newHeaders,
+      });
+      // --- END OF FIX ---
 
     } catch (error) {
       console.error('Unhandled error in fetch handler:', error);
@@ -29,7 +38,6 @@ export default {
   },
 
   async handleApiRequest(request, env, ctx) {
-    // --- CACHING LOGIC ---
     const cache = caches.default;
     let response = await cache.match(request);
     if (response) {
@@ -37,20 +45,19 @@ export default {
       return response;
     }
     console.log("Cache MISS");
-    // --- END CACHING LOGIC ---
 
     try {
       if (!env.TMDB_API_TOKEN) {
-        return new Response("Secret binding 'TMDB_API_TOKEN' not found. Please add it in your Cloudflare dashboard.", { status: 500 });
+        return new Response("Secret binding 'TMDB_API_TOKEN' not found.", { status: 500 });
       }
 
       const apiToken = await env.TMDB_API_TOKEN.get();
       if (!apiToken) {
-        return new Response("Failed to retrieve the API token value. The secret might be empty.", { status: 500 });
+        return new Response("Failed to retrieve the API token value.", { status: 500 });
       }
 
       const url = new URL(request.url);
-      const path = url.pathname.substring(5); // Correctly removes "/api/"
+      const path = url.pathname.substring(5);
       const queryString = url.search;
       const apiUrl = `${TMDB_BASE_URL}/${path}${queryString}`;
 
@@ -63,13 +70,20 @@ export default {
 
       response = await fetch(apiRequest);
 
-      // --- CACHING LOGIC ---
       if (response.ok) {
-        const cacheableResponse = response.clone();
-        cacheableResponse.headers.set('Cache-Control', 'public, max-age=3600'); // Cache for 1 hour
+        // --- THE FIX IS ALSO HERE ---
+        // Create a new, mutable response for the cache
+        const newHeaders = new Headers(response.headers);
+        newHeaders.set('Cache-Control', 'public, max-age=3600'); // Cache for 1 hour
+
+        const cacheableResponse = new Response(response.body, {
+            ...response,
+            headers: newHeaders,
+        });
+
         ctx.waitUntil(cache.put(request, cacheableResponse));
       }
-      // --- END CACHING LOGIC ---
+      // --- END OF FIX ---
 
       return response;
 
